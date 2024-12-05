@@ -1,21 +1,20 @@
 import os
 import argparse
 from tqdm import tqdm
-
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
 def get_arguments() -> argparse.Namespace:
     """
-    parse all the arguments from command line inteface
+    parse all the arguments from command line interface
     return a list of parsed arguments
     """
-    parser = argparse.ArgumentParser(description="convert pred and gt list to images.")
+    parser = argparse.ArgumentParser(description="Convert pred and gt list to images.")
     parser.add_argument(
-        "file_list_path",
+        "videos_dir",  # Changed from "file_list_path" to "videos_dir"
         type=str,
-        help="path to dataset file list",
+        help="Path to the directory containing video files",
     )
     parser.add_argument(
         "labels_path",
@@ -47,18 +46,22 @@ def load_action_dict(label_path):
 
     return id2class_map, class2id_map
 
-def parse_file_paths(input_path):
-    file_ptr = open(input_path, 'r')
-    info = file_ptr.read().split('\n')[:-1]
-    file_ptr.close()
-    return info
-        
+def parse_video_names(videos_dir):
+    """
+    Get a list of video file names from the given directory.
+    It assumes the videos have an extension such as .mp4, .avi, or similar.
+    """
+    video_files = [f for f in os.listdir(videos_dir) if f.endswith(('.mp4', '.avi', '.mov', '.mkv'))]
+    return video_files
+
 def main() -> None:
     args = get_arguments()
 
     os.makedirs(args.output_dir, exist_ok=True)
     
-    file_list = parse_file_paths(args.file_list_path)
+    # Get the list of video files from the videos directory
+    file_list = parse_video_names(args.videos_dir)
+    
     id2class_map, class2id_map = load_action_dict(args.mapping_txt_path)
 
     num_dict = {}
@@ -69,7 +72,7 @@ def main() -> None:
     nums = [0 for i in range(len(id2class_map))]
     boundary_nums = [0 for i in range(2)]
     frames_cnt = 0 
-    for file_name in tqdm(file_list, desc="label count"):
+    for file_name in tqdm(file_list, desc="Label count"):
         video_name = file_name.split('.')[0]
         label_path = os.path.join(args.labels_path, video_name + '.txt')
         file_ptr = open(label_path, 'r')
@@ -97,7 +100,7 @@ def main() -> None:
         for n, c in zip(num, cnt):
             boundary_nums[n] += c
         
-        # save action duration
+        # Save action duration
         boundary_index_list = [0]
         before_action_name = content[0]
         for index in range(1, len(content)):
@@ -122,9 +125,9 @@ def main() -> None:
     
     num_duraction = np.array(duration_list)
     
-    plt.hist(num_duraction, bins=100, density = True, range=(0, 2000))
+    plt.hist(num_duraction, bins=100, density=True, range=(0, 2000))
     plt.vlines(64, 0, 0.008, color="red")
-    plt.title('hist for action duration')
+    plt.title('Histogram for action duration')
     plt.xlabel("Frame duration")
     plt.ylabel('Density')
     plt.savefig(os.path.join(args.output_dir, "action_duration_count.png"), bbox_inches='tight', dpi=500)
@@ -145,9 +148,9 @@ def main() -> None:
     plt.close()
 
     num_duraction = np.array(video_duration_list)
-    plt.hist(num_duraction, bins=100, density = True, range=(0, max(num_duraction)))
+    plt.hist(num_duraction, bins=100, density=True, range=(0, max(num_duraction)))
     plt.vlines(512, 0, 0.001, color="red")
-    plt.title('hist for video duration')
+    plt.title('Histogram for video duration')
     plt.xlabel("Frame duration")
     plt.ylabel('Density')
     plt.savefig(os.path.join(args.output_dir, "video_duration_count.png"), bbox_inches='tight', dpi=500)
@@ -156,7 +159,7 @@ def main() -> None:
     print(f"Avg. frames length is: {np.mean(num_duraction)}")
 
     weights_dict = {}
-    # crossentropy weight compute by median frequency balancing
+    # Cross entropy weight compute by median frequency balancing
     """
     Class weight for CrossEntropy
     Class weight is calculated in the way described in:
@@ -180,16 +183,13 @@ def main() -> None:
     pos_weight = 1 / pos_ratio
 
     out_txt_file_path = os.path.join(args.output_dir, "weights.txt")
-    f = open(out_txt_file_path, "w", encoding='utf-8')
-    f.write("Class weight for CrossEntropy: \n")
-    for key, action_wights in weights_dict.items():
-        str_str = str(key) + " " + str(action_wights) + "\n"
-        f.write(str_str)
-    f.write("Position weight for Boundary BCEWithLogitsLoss: \n")
-    for name, weights in zip(["unboundary", "boundary"], pos_weight):
-        str_str = str(name) + " " + str(weights) + "\n"
-        f.write(str_str)
-    f.close()
+    with open(out_txt_file_path, "w", encoding='utf-8') as f:
+        f.write("Class weight for CrossEntropy: \n")
+        for key, action_weights in weights_dict.items():
+            f.write(f"{key} {action_weights}\n")
+        f.write("Position weight for Boundary BCEWithLogitsLoss: \n")
+        for name, weight in zip(["unboundary", "boundary"], pos_weight):
+            f.write(f"{name} {weight}\n")
 
 
 if __name__ == "__main__":

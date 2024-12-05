@@ -1,7 +1,7 @@
 # **Utility Functions** 
 
 
-## **Feature Manifold Visualization
+## **Feature Manifold Visualization**
 
 - **Description**:
 
@@ -14,6 +14,14 @@ Use the following command to run the 'feature_manifold_visualization.py' file
 ```python
 
 python feature_manifold_visualization.py -i path/to/features/file.npy -l path/to/groundTruth/file.txt
+
+```
+
+- **Example**:
+
+```python
+
+python feature_manifold_visualization.py -i ./data/features/S1_Cheese_C1.npy -l ./data/features/S1_Cheese_C1.txt
 
 ```
 
@@ -31,9 +39,15 @@ Use the following commands to run the 'labels_visualization.py' file
 
 ```python
 
-python generate_all_files.py /path/to/video/files/directory /path/to/save/all_files.txt
+python labels_visualization.py /path/to/videos /path/to/labels /path/to/mapping.txt /path/to/output
 
-python labels_visualization.py path/to/all_files.txt path/to/groundTruth path/to/mapping.txt /path/to/output
+```
+
+- **Example**:
+
+```python
+
+python labels_visualization.py ./data/gtea/videos ./data/gtea/groundTruth ./data/mapping.txt /output
 
 ```
 
@@ -50,5 +64,64 @@ Use the following commands to run the 'data_visualization.py' file
 ```python
 
 python data_visualization.py /path/to/input/file.mp4 path/to/annotations.json path/to/output.mp4
+
+```
+
+- **Example**:
+
+```python
+
+python data_visualization.py ./data/gtea/videos/S1_Cheese_C1.mp4 ./data/annotations.json output/S1_Cheese_C1.mp4
+
+```
+
+## **Action Visualization**
+
+- **Description**:
+
+This script displays the actions occuring at different frames in the video given.
+
+- **How to Run**:
+
+Use the following commands to run the 'data_visualization.py' file
+
+```python
+
+python action_visualization.py /path/to/videos/directory path/to/frame_labels/directory path/to/output/directory
+
+```
+
+- **Example**:
+
+```python
+
+python action_visualization.py ./data/gtea/videos ./data/gtea/frame_labels ./output
+
+
+```
+
+## **Prediction Visualization**
+
+- **Description**:
+
+This script visualizes the comparison between ground truth and predicted action labels for videos. It generates images that show side-by-side plots of ground truth and prediction sequences, using color-coded labels for each action class. The generated images are saved in the specified output directory.
+
+- **How to Run**:
+
+Use the following commands to run the 'prediction_visualization.py' file
+
+```python
+
+python prediction_visualization.py /path/to/prediction/files.txt /path/to/mapping.txt /path/to/output/directory --ground_truth_dir path/to/ground/Truth --sliding_windows /size/
+
+
+```
+
+- **Example**:
+
+```python
+
+python prediction_visualization.py .data/prediction/files.txt .data/gtea/mapping.txt /output/ --ground_truth_dir ./data/gtea/groundTruth --sliding_windows 128
+
 
 ```
