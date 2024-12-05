@@ -4,11 +4,11 @@ This directory contains implementations of various backbone architectures for de
 
 ---
 
-## **Available Backbones**6
+## **Available Backbones**
 
-1. **PResNet** (`presnet.py`): A customizable residual network architecture supporting `ResNet18`, `ResNet50`, and `ResNet101`.
-2. **DLA34** (`dla34.py`): Deep Layer Aggregation (DLA) architecture for efficient feature reuse.
-3. **RegNet** (`regnet.py`): A modern backbone for efficient neural network scaling.
+1. **ResNet** (`resnet.py`): A customizable residual network architecture supporting `ResNet18`, `ResNet50`, and `ResNet101`.
+2. **DLA** (`dla.py`): Deep Layer Aggregation (DLA) architecture for efficient feature reuse, supporting multiple configurations (`DLA34`, `DLA46`, `DLA60`, `DLA102`).
+3. **RegNet** (`regnet.py`): A modern backbone for efficient neural network scaling, supporting `y` variants (`regnet-y-040`, `regnet-y-080`, etc.).
 
 ---
 
@@ -23,7 +23,7 @@ All backbone models take a **4D Tensor** as input:
 
 ## **Output Details**
 
-### **1. PResNet (`presnet.py`)**
+### **1. ResNet (`resnet.py`)**
 - Supports `ResNet18`, `ResNet50`, and `ResNet101` by setting the `depth` parameter to `18`, `50`, or `101`.
 - **Return Type**: List of feature maps from selected layers (controlled by `return_idx`).
 - **Output Shapes**:
@@ -34,14 +34,23 @@ All backbone models take a **4D Tensor** as input:
     - `ResNet50`: Similar to `ResNet18` but with larger feature dimensions due to `BottleNeck`.
     - `ResNet101`: Similar to `ResNet50` with deeper layers.
 
-### **2. DLA34 (`dla34.py`)**
+### **2. DLA (`dla.py`)**
+- **Variants**: The DLA architecture has multiple configurations, such as `DLA34`, `DLA46`, `DLA60`, and `DLA102`. Each variant corresponds to a different network depth and complexity, with deeper networks capable of capturing more hierarchical features.
 - **Return Type**: List of feature maps from selected levels (controlled by `return_index`).
 - **Output Shapes**:
   - Each element in the output list corresponds to a DLA level.
   - Example for input shape `(batch_size, 3, 224, 224)`:
     - `[torch.Size([batch_size, 128, 56, 56]), ..., torch.Size([batch_size, 512, 7, 7])]`
+  - Each variant will have a slightly different number of layers and feature map dimensions, but the output format remains consistent.
+
+  Supported variants:
+  - **DLA34**: Standard configuration with 34 layers.
+  - **DLA46**: A variant with 46 layers.
+  - **DLA60**: A variant with 60 layers.
+  - **DLA102**: A deeper version with 102 layers.
 
 ### **3. RegNet (`regnet.py`)**
+- **Variants**: The available variants for RegNet are all from the `y` series, such as `regnet-y-040`, `regnet-y-080`, `regnet-y-160`, etc. These variants differ in the number of channels and depth, providing a scalable architecture for efficient neural network design.
 - **Return Type**: Selected hidden states from the RegNet model (controlled by `return_idx`).
 - **Output Shapes**:
   - Each element corresponds to a hidden state from the backbone layers.
@@ -52,12 +61,13 @@ All backbone models take a **4D Tensor** as input:
 
 ## **Usage**
 
-### **1. PResNet**
+### **1. ResNet**
 ```python
 import torch
-from backbone import *
+from resnet import ResNet
 
-model = PResNet(depth=101, pretrained=True, return_idx=[0, 1, 2, 3])
+# Initialize the ResNet model with depth=50 (ResNet50), return feature maps from layers 0, 1, and 2
+model = ResNet(depth=50, pretrained=True, return_idx=[0, 1, 2])
 
 input_tensor = torch.randn(8, 3, 224, 224)
 
@@ -67,44 +77,59 @@ for idx, feature_map in enumerate(output):
     print(f"Feature Map {idx}: {feature_map.shape}")
 ```
 
-### **2. DLA34**
+### **2. DLA**
 ```python
 import torch
-from backbone.dla34 import DLANet
+from dla import DLANet
 
-model = DLANet(return_index=[2, 3, 4])
+input = torch.randn(8, 3, 224, 224)
 
-input_tensor = torch.randn(8, 3, 224, 224)
-output = model(input_tensor)
+model = DLANet(dla='dla34', pretrained=True)
 
-for idx, feature_map in enumerate(output):
-    print(f"Level {idx + 2} Feature Map: {feature_map.shape}")
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+model.to(device)
+input = input.to(device)
+
+model.eval()
+with torch.no_grad(): 
+    output = model(input)
+
+print(f"Output shape: {output[0].shape}")
 ```
 
 ### **3. RegNet**
 ```python
 import torch
-from backbone.regnet import RegNet
+from regnet import RegNet
 
-configuration = {
-    "num_classes": 1000,  # Number of output classes
-    "input_channels": 3   # Input channels (RGB images)
-}
-
-model = RegNet(configuration=configuration, return_idx=[0, 1, 2])
+model = RegNet(variant="regnet-y-080", return_idx=[0, 1, 2])
 
 input_tensor = torch.randn(8, 3, 224, 224)
-output = model(input_tensor)
 
-for idx, hidden_state in enumerate(output):
-    print(f"Hidden State {idx}: {hidden_state.shape}")
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+model.to(device)
+input_tensor = input_tensor.to(device)
+
+model.eval()
+with torch.no_grad():
+    output = model(input_tensor)
+
+print(f"Output shapes: {[o.shape for o in output]}")
 ```
 
-## **Run Testing Scripts**
+---
 
-- cd C:\VisionRD\AI-Hackathon24\arch> 
-- python -m backbone.resnet_testing
+## **Testing Model Backbones**
 
+- Navigate to your project directory:
+  - `cd C:\VisionRD\AI-Hackathon24\arch\backbone`
+  
+- Create a testing script 'testing.py'
+- Run the following command:
+
+ ```python
+python testing.py
+```
 ---
 
 ## **Customization**
@@ -115,8 +140,8 @@ for idx, hidden_state in enumerate(output):
 
 ### **Selecting Features**
 - The indices of the output layers can be customized using:
-  - `return_idx` for PResNet and RegNet.
-  - `return_index` for DLA34.
+  - `return_idx` for ResNet and RegNet.
+  - `return_index` for DLA.
 
 ---
 
@@ -127,7 +152,6 @@ for idx, hidden_state in enumerate(output):
 
 ---
 
-
 ## **FAQ**
 
 ### Q1. How do I use these backbones in my own task?
@@ -136,6 +160,6 @@ for idx, hidden_state in enumerate(output):
 - Extract the output feature maps for downstream tasks like classification, segmentation, or detection.
 
 ### Q2. What are the advantages of each backbone?
-- **PResNet**: Flexible and supports multiple ResNet depths (18, 50, 101).
-- **DLA34**: Efficient feature reuse with hierarchical structure.
-- **RegNet**: Scalable and efficient for modern architectures.
+- **ResNet**: Flexible and supports multiple ResNet depths (18, 50, 101).
+- **DLA**: Efficient feature reuse with hierarchical structure, ideal for tasks requiring multi-scale feature extraction. Choose the appropriate variant depending on the required depth and complexity (DLA34, DLA46, DLA60, DLA102).
+- **RegNet**: Scalable and efficient for modern architectures, with `y` variants offering a range of options for different computational budgets.

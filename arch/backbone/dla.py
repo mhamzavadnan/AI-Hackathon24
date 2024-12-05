@@ -9,6 +9,7 @@ from os.path import join
 import torch
 from torch import nn
 import torch.utils.model_zoo as model_zoo
+# from mmdet.models.builder import BACKBONES
 
 
 BN_MOMENTUM = 0.1
@@ -16,7 +17,8 @@ logger = logging.getLogger(__name__)
 
 
 def get_model_url(data='imagenet', name='dla34', hash='ba72cf86'):
-    return f'http://dl.yf.io/dla/models/{data}/{name}-{hash}.pth'
+    return join('http://dl.yf.io/dla/models', data, '{}-{}.pth'.format(name, hash))
+
 
 def conv3x3(in_planes, out_planes, stride=1):
     "3x3 convolution with padding"
@@ -391,30 +393,63 @@ class DLA(nn.Module):
         # self.fc = fc
 
 
-def dla34(pretrained=True, levels=None, in_channels=None, **kwargs):  # DLA-34
+# Add DLA variants with different numbers of layers
+def dla34(pretrained=True, levels=None, in_channels=None, **kwargs):
     model = DLA(levels=levels, channels=in_channels, block=BasicBlock, **kwargs)
     if pretrained:
         model.load_pretrained_model(data='imagenet', name='dla34', hash='ba72cf86')
     return model
 
+def dla46(pretrained=True, levels=None, in_channels=None, **kwargs):
+    model = DLA(levels=levels, channels=in_channels, block=BasicBlock, **kwargs)
+    if pretrained:
+        model.load_pretrained_model(data='imagenet', name='dla46', hash='ad32cb9f')  # Add appropriate hash
+    return model
+
+def dla60(pretrained=True, levels=None, in_channels=None, **kwargs):
+    model = DLA(levels=levels, channels=in_channels, block=BasicBlock, **kwargs)
+    if pretrained:
+        model.load_pretrained_model(data='imagenet', name='dla60', hash='c4d2260d')  # Add appropriate hash
+    return model
+
+def dla102(pretrained=True, levels=None, in_channels=None, **kwargs):
+    model = DLA(levels=levels, channels=in_channels, block=BasicBlock, **kwargs)
+    if pretrained:
+        model.load_pretrained_model(data='imagenet', name='dla102', hash='687b1b3f')  # Add appropriate hash
+    return model
+
+# DLANet class allowing for model selection
 class DLANet(nn.Module):
     def __init__(
         self,
-        dla='dla34',
+        dla='dla34',  # Default model is dla34
         pretrained=True,
         levels=[1, 1, 1, 2, 2, 1],
         in_channels=[16, 32, 64, 128, 256, 512],
-        return_index = [1, 2, 3],
+        return_index=[1, 2, 3],
         cfg=None,
     ):
         super(DLANet, self).__init__()
         self.cfg = cfg
         self.in_channels = in_channels
 
-        self.model = eval(dla)(
+        # Dynamically select the model variant
+        model_dict = {
+            'dla34': dla34,
+            'dla46': dla46,
+            'dla60': dla60,
+            'dla102': dla102,
+        }
+
+        if dla not in model_dict:
+            raise ValueError(f"Invalid DLA model name '{dla}'. Choose from: {list(model_dict.keys())}.")
+
+        # Create the selected DLA model variant
+        self.model = model_dict[dla](
             pretrained=pretrained, levels=levels, in_channels=in_channels
         )
         self.return_index = return_index
+
     def forward(self, x):
         x = self.model(x)
         max_list = max(self.return_index)
