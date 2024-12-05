@@ -1,5 +1,6 @@
 import os
 import cv2
+import argparse
 
 def overlay_action_labels(video_dir, label_dir, output_dir):
     os.makedirs(output_dir, exist_ok=True)
@@ -61,12 +62,27 @@ def overlay_action_labels(video_dir, label_dir, output_dir):
         cap.release()
         out.release()
         print(f"Processed {video_file} and saved to {output_path}")
-        break
 
     print("All videos processed and labeled.")
 
+def get_arguments():
+    """
+    Parse command line arguments
+    """
+    parser = argparse.ArgumentParser(description="Overlay action labels on videos.")
+    parser.add_argument(
+        "video_dir", type=str, help="Path to the directory containing video files"
+    )
+    parser.add_argument(
+        "label_dir", type=str, help="Path to the directory containing label files"
+    )
+    parser.add_argument(
+        "output_dir", type=str, help="Path to the output directory to save labeled videos"
+    )
 
-video_dir = "videos"
-label_dir = "Frame_Labels"
-output_dir = "labeled_videos"
-overlay_action_labels(video_dir, label_dir, output_dir)
+    return parser.parse_args()
+
+if __name__ == "__main__":
+    args = get_arguments()
+
+    overlay_action_labels(args.video_dir, args.label_dir, args.output_dir)
