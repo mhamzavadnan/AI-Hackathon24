@@ -9,8 +9,6 @@ from collections import OrderedDict
 from .common import get_activation, ConvNormLayer, FrozenBatchNorm2d
 
 
-__all__ = ['PResNet']
-
 
 ResNet_cfg = {
     18: [2, 2, 2, 2],
