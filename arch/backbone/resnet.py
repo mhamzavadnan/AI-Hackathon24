@@ -135,7 +135,7 @@ class Blocks(nn.Module):
         return out
 
 
-class PResNet(nn.Module):
+class ResNet(nn.Module):
     def __init__(
         self, 
         depth, 
