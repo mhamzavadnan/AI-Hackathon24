@@ -69,9 +69,8 @@ The `arches/` directory contains subfolders for various backbone architectures. 
 - **Variants:** DLA-34, DLA-46, DLA-60, DLA-102
 - Description: DLA combines information across layers in a hierarchical manner, improving feature aggregation and task performance.
 
----
 
-### Folder Structure
+#### Folder Structure
 Each architecture folder contains the following:
 - Model definitions and initialization scripts.
 - Pretrained weights (if applicable).
