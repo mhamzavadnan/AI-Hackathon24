@@ -7,7 +7,7 @@ import os
 root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(root_dir)
 
-from arch.backbone import *
+# from arch.backbone import *
 
 
 def vis_graph(arch, input, all_layers=True, save=False, scale=1.5):
@@ -47,10 +47,10 @@ def vis_graph(arch, input, all_layers=True, save=False, scale=1.5):
 
     return 
 
-model = PResNet(depth=101, pretrained=True, return_idx=[0, 1, 2, 3])
+# model = ResNet(depth=101, pretrained=True, return_idx=[0, 1, 2, 3])
 
-model_input = torch.randn(8, 3, 224, 224)
+# model_input = torch.randn(8, 3, 224, 224)
 
-output = model(model_input)
+# output = model(model_input)
 
-vis_graph(model, model_input, all_layers=True, save=True, scale=2)
+# vis_graph(model, model_input, all_layers=True, save=True, scale=2)
