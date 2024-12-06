@@ -7,7 +7,28 @@ import pandas as pd
 import numpy as np
 from sklearn.manifold import TSNE
 import cv2
+'''
+t-SNE Basics
+t-SNE is a dimensionality reduction technique that maps high-dimensional data into a two-dimensional or three-dimensional space for visualization. It is particularly useful for visualizing clusters or groupings in the data.
 
+X and Y Axes
+The X-axis and Y-axis in a t-SNE plot are arbitrary and do not correspond to any specific features or variables in the original data. Instead, they represent the transformed low-dimensional coordinates of the data points.
+The axes should be interpreted in relative terms, focusing on the structure of the data rather than absolute values.
+What Does This Plot Show?
+Clusters and Groupings:
+
+Each point represents a data sample.
+Points that are close together in the plot are similar in the high-dimensional feature space, while points farther apart are less similar.
+Color-Coded Labels:
+
+The colors represent distinct classes or categories (e.g., "background," "take," "open," etc.).
+The plot shows how well the classes separate in the low-dimensional space.
+Insights:
+
+If clusters for different classes are well-separated, it suggests that the features used can effectively distinguish between these classes.
+Overlapping clusters might indicate some ambiguity or similarity between classes in the feature space.
+ 
+'''
 def tsne(args):
     # Check if the output directory exists, if not create it
     output_dir = args.out_path
