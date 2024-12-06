@@ -38,7 +38,8 @@ The **Georgia Tech Egocentric Activities (GTEA)** dataset contains seven types o
 For more details, refer to the GTEA dataset [website](https://sites.google.com/view/gtea/). Videos should be downloaded separately as instructed.
 
 1. **Download the dataset** using the link provided [here](https://drive.google.com/drive/folders/1WLRThi__ScZdeQQfCOfNDL5xpvo-YUd4?usp=sharing).
-2. Place the data files in the `data/` folder.
+
+3. Place the data files in the `data/` folder.
 
 </div>
 
