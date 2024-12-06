@@ -16,6 +16,8 @@ VisionRD-AI-Hackathon-2024/
 ├── utils/                        # Utility scripts for data visualization and model visualization
 ├── requirements.txt              # Python dependencies
 └── main.py                       # Entry point script
+└── requirements.txt                
+
 ```
 ---
 
@@ -113,7 +115,28 @@ Detailed usage instructions are in `utils/README.md`.
 ---
 
 ## 🚀 Quick Start
-1. Clone this repository:
-   ```bash
-   git clone https://github.com/<your-username>/VisionRD-AI-Hackathon-2024.git
-   cd VisionRD-AI-Hackathon-2024
+
+Follow these steps to get started with the VisionRD AI Hackathon repository:
+
+### 1. Clone the Repository
+First, clone this repository to your local machine:
+```bash
+git clone https://github.com/<your-username>/VisionRD-AI-Hackathon-2024.git
+cd VisionRD-AI-Hackathon-2024
+```
+
+### 2. Install dependencies
+```bash
+pip install -r requirements.txt
+```
+
+### 3. Prepare the Dataset
+```plaintext
+VisionRD-AI-Hackathon-2024/
+└── data/
+    └── GTEA/
+```
+
+
+This markdown provides clear instructions for setting up the repository and starting the project, ensuring participants have a seamless onboarding experience. Let me know if you'd like further adjustments! Start building your custom architectures, writing training & inference scripts, and logging your evaluations on tensorboard!!
+
