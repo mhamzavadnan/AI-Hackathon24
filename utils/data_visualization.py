@@ -12,16 +12,19 @@ FINGER_CONNECTIONS = {
     'pinky': [(17, 18), (18, 19), (19, 20)]
 }
 
-def visualize_annotations(image, annotations, visualize_bboxes=True, visualize_keypoints=True):
+def visualize_annotations(image, anns, visualize_bboxes=True, visualize_keypoints=True):
+
+  
+
     if visualize_bboxes:
-        for ann in annotations:
+        for ann in anns:
             bbox = ann.get('bbox', None)
             if bbox:
                 x, y, w, h = map(int, bbox)
                 cv2.rectangle(image, (x, y), (x + w, y + h), (0, 255, 0), 2)
 
     if visualize_keypoints:
-        for ann in annotations:
+        for ann in anns:
             keypoints = ann.get('keypoints', None)
             if keypoints:
                 for i in range(0, len(keypoints), 3):
@@ -58,9 +61,10 @@ def process_folder(input_folder, annotations_file, output_folder):
             if image is None:
                 print(f"Error: Could not load image {filename}")
                 continue
-
-            # Get the annotations for the current frame (this assumes that each image has a corresponding entry in the JSON file)
-            annotations = annotations_data.get(filename, [])
+            image_id = int(filename.split('.')[0].split('_')[-1])
+            annotations = [annos for annos in annotations_data['annotations'] if annos['image_id']==image_id]
+            action = annotations[0].get('action', 'dummy')
+            cv2.putText(image, action, (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
 
             # Visualize annotations on the image
             annotated_image = visualize_annotations(image, annotations)
@@ -71,10 +75,10 @@ def process_folder(input_folder, annotations_file, output_folder):
             print(f"Processed {filename} and saved to {output_image_path}")
 
 def main():
-    parser = argparse.ArgumentParser(description='Process a folder of images and save annotated frames.',default="data")
-    parser.add_argument('input_folder', type=str, help='Path to the folder containing PNG frames',default="data")
-    parser.add_argument('annotations_file', type=str, help='Path to the JSON file containing annotations',default="data")
-    parser.add_argument('output_folder', type=str, help='Path to the folder where processed frames will be saved',default="output_folder")
+    parser = argparse.ArgumentParser(description='Process a folder of images and save annotated frames.')
+    parser.add_argument('--input_folder', type=str, help='Path to the folder containing PNG frames',default="data")
+    parser.add_argument('--annotations_file', type=str, help='Path to the JSON file containing annotations',default="data")
+    parser.add_argument('--output_folder', type=str, help='Path to the folder where processed frames will be saved',default="output_folder")
     args = parser.parse_args()
 
     # Process the folder and save annotated frames
