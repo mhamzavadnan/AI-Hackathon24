@@ -28,66 +28,57 @@ def visualize_annotations(image, annotations, visualize_bboxes=True, visualize_k
                     x, y, visibility = keypoints[i], keypoints[i+1], keypoints[i+2]
                     if visibility > 0:
                         cv2.circle(image, (int(x), int(y)), 5, (0, 0, 255), -1)
-                
+
                 for finger, connections in FINGER_CONNECTIONS.items():
                     for (start, end) in connections:
                         start_x, start_y = int(keypoints[start * 3]), int(keypoints[start * 3 + 1])
                         end_x, end_y = int(keypoints[end * 3]), int(keypoints[end * 3 + 1])
 
-                        if keypoints[start * 3 + 2] > 0 and keypoints[end * 3 + 2] > 0:
-                            cv2.line(image, (start_x, start_y), (end_x, end_y), (0, 255, 255), 2)
+                        # Draw line between connected keypoints
+                        cv2.line(image, (start_x, start_y), (end_x, end_y), (255, 0, 0), 2)
 
     return image
 
-def process_video(video_path, annotation_path, output_video_name):
-    with open(annotation_path, 'r') as f:
+def process_folder(input_folder, annotations_file, output_folder):
+    # Create output folder if it doesn't exist
+    if not os.path.exists(output_folder):
+        os.makedirs(output_folder)
+
+    # Load annotations
+    with open(annotations_file, 'r') as f:
         annotations_data = json.load(f)
 
-    if 'annotations' not in annotations_data:
-        print("Error: The annotations data does not contain the expected 'annotations' key.")
-        return
+    # Iterate over all PNG files in the input folder
+    for filename in os.listdir(input_folder):
+        if filename.endswith(".png"):
+            # Read the image
+            image_path = os.path.join(input_folder, filename)
+            image = cv2.imread(image_path)
 
-    annotations = annotations_data['annotations']
+            if image is None:
+                print(f"Error: Could not load image {filename}")
+                continue
 
-    cap = cv2.VideoCapture(video_path)
-    if not cap.isOpened():
-        print(f"Error: Unable to open video file {video_path}")
-        return
+            # Get the annotations for the current frame (this assumes that each image has a corresponding entry in the JSON file)
+            annotations = annotations_data.get(filename, [])
 
-    fps = cap.get(cv2.CAP_PROP_FPS)
-    frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
-    width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
-    height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+            # Visualize annotations on the image
+            annotated_image = visualize_annotations(image, annotations)
 
-    fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-    output_video = cv2.VideoWriter(output_video_name, fourcc, fps, (width, height))
+            # Save the annotated image in the output folder
+            output_image_path = os.path.join(output_folder, filename)
+            cv2.imwrite(output_image_path, annotated_image)
+            print(f"Processed {filename} and saved to {output_image_path}")
 
-    while True:
-        ret, frame = cap.read()
-        if not ret:
-            break
-
-        frame_idx = int(cap.get(cv2.CAP_PROP_POS_FRAMES)) - 1
-        frame_annotations = [ann for ann in annotations if ann['image_id'] == frame_idx]
-
-        frame_with_annotations = visualize_annotations(frame, frame_annotations)
-
-        output_video.write(frame_with_annotations)
-
-        cv2.imshow('Video with Annotations', frame_with_annotations)
-
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
-
-    cap.release()
-    output_video.release()
-    cv2.destroyAllWindows()
-
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Visualize hand annotations on a video")
-    parser.add_argument('video_path', type=str, help="Path to the input video")
-    parser.add_argument('annotation_path', type=str, help="Path to the annotation file (JSON)")
-    parser.add_argument('output_video_name', type=str, help="Name for the output video")
+def main():
+    parser = argparse.ArgumentParser(description='Process a folder of images and save annotated frames.',default="data")
+    parser.add_argument('input_folder', type=str, help='Path to the folder containing PNG frames',default="data")
+    parser.add_argument('annotations_file', type=str, help='Path to the JSON file containing annotations',default="data")
+    parser.add_argument('output_folder', type=str, help='Path to the folder where processed frames will be saved',default="output_folder")
     args = parser.parse_args()
 
-    process_video(args.video_path, args.annotation_path, args.output_video_name)
+    # Process the folder and save annotated frames
+    process_folder(args.input_folder, args.annotations_file, args.output_folder)
+
+if __name__ == '__main__':
+    main()

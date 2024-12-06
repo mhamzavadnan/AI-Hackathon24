@@ -47,7 +47,7 @@ def vis_graph(arch, input, all_layers=True, save=False, scale=1.5):
 
     return 
 
-model = PResNet(depth=101, pretrained=True, return_idx=[0, 1, 2, 3])
+model = ResNet(depth=101, pretrained=True, return_idx=[0, 1, 2, 3])
 
 model_input = torch.randn(8, 3, 224, 224)
 
