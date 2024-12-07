@@ -99,29 +99,3 @@ python action_visualization.py ./data/gtea/videos ./data/gtea/frame_labels ./out
 
 
 ```
-
-## **Prediction Visualization**
-
-- **Description**:
-
-This script visualizes the comparison between ground truth and predicted action labels for videos. It generates images that show side-by-side plots of ground truth and prediction sequences, using color-coded labels for each action class. The generated images are saved in the specified output directory.
-
-- **How to Run**:
-
-Use the following commands to run the 'prediction_visualization.py' file
-
-```python
-
-python prediction_visualization.py /path/to/prediction/files.txt /path/to/mapping.txt /path/to/output/directory --ground_truth_dir path/to/ground/Truth --sliding_windows /size/
-
-
-```
-
-- **Example**:
-
-```python
-
-python prediction_visualization.py .data/prediction/files.txt .data/gtea/mapping.txt /output/ --ground_truth_dir ./data/gtea/groundTruth --sliding_windows 128
-
-
-```
