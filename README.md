@@ -15,8 +15,7 @@ VisionRD-AI-Hackathon-2024/
 ├── arches/backbone               # Backbone architectures (ResNet, RegNet, DLA)
 ├── utils/                        # Utility scripts for data visualization and model visualization
 ├── requirements.txt              # Python dependencies
-└── main.py                       # Entry point script
-└── requirements.txt                
+└── main.py                       # Entry point script            
 
 ```
 ---
