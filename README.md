@@ -38,7 +38,7 @@ For more details, refer to the GTEA dataset [website](https://sites.google.com/v
 
 1. **Download the dataset** using the commands provided.
 
-label link : [website](https://drive.google.com/drive/folders/1WLRThi__ScZdeQQfCOfNDL5xpvo-YUd4?usp=sharing)
+label link : [labels](https://drive.google.com/drive/folders/1WLRThi__ScZdeQQfCOfNDL5xpvo-YUd4?usp=sharing)
    
 a) Frames
 ```bash
