@@ -110,14 +110,9 @@ utils/
 ├── arch_visualization.py                   # Visualize model architectures
 ├── data_visualization.py                   # Visualize dataset samples
 ├── feature_manifold_visualization.py       # Visualize feature manifolds
-├── generate_all_files.py                   # Generate required files for pipelines
 ├── labels_visualization.py                 # Visualize labels and annotations
-├── prediction_visualization.py             # Visualize model predictions
-├── splitter.py                             # Split datasets into training, validation, and testing
 ├── xml_to_coco.py                          # Convert XML annotations to COCO format
-├── data_processing.py                      # Functions for preprocessing the dataset
-└── model_utils.py                          # Tools to load, save, or evaluate models
-```
+├── xml_vis.py                              # Visualize XML annotations
 
 Detailed usage instructions are in `utils/README.md`.
 
